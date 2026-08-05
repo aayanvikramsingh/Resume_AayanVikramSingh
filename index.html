@@ -170,15 +170,57 @@
     </p>
 
     <div class="actions">
-      <a class="btn btn-primary" href="Aayan_Vikram_Singh_Resume.pdf" target="_blank" rel="noreferrer">Read the resume</a>
-      <a class="btn btn-secondary" href="https://drive.google.com/file/d/1HlspyCmKD3cql27tezjte6TPhlzsA47j/view?usp=sharing" target="_blank" rel="noreferrer">Open Drive copy</a>
+      <a class="btn btn-primary" data-track="read-resume" href="Aayan_Vikram_Singh_Resume.pdf" target="_blank" rel="noreferrer">Read the resume</a>
+      <a class="btn btn-secondary" data-track="open-drive" href="https://drive.google.com/file/d/1HlspyCmKD3cql27tezjte6TPhlzsA47j/view?usp=sharing" target="_blank" rel="noreferrer">Open Drive copy</a>
     </div>
 
     <nav class="links" aria-label="Quick links">
-      <a href="https://www.linkedin.com/in/aayanvikramsingh" target="_blank" rel="noreferrer">LinkedIn</a>
-      <a href="https://github.com/aayanvikramsingh" target="_blank" rel="noreferrer">GitHub</a>
-      <a href="mailto:aayanv5201@gmail.com">Email</a>
+      <a data-track="linkedin" href="https://www.linkedin.com/in/aayanvikramsingh" target="_blank" rel="noreferrer">LinkedIn</a>
+      <a data-track="github" href="https://github.com/aayanvikramsingh" target="_blank" rel="noreferrer">GitHub</a>
+      <a data-track="email" href="mailto:aayanv5201@gmail.com">Email</a>
     </nav>
   </main>
+
+<script>
+// Counts visits and link clicks. Sends no cookies and sets no storage, so it
+// needs no consent banner; the worker never keeps anything that identifies a
+// person. Dashboard lives at ./stats.html.
+(function () {
+  var ENDPOINT = 'https://resume-stats.aayanvikramsingh.workers.dev/hit';
+
+  var params = new URLSearchParams(location.search);
+
+  function send(event) {
+    var body = JSON.stringify({
+      event: event,
+      ref: document.referrer || '',
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || ''
+    });
+
+    // text/plain keeps this a "simple" request, so the beacon fires without a
+    // CORS preflight it would not be able to perform.
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(ENDPOINT, new Blob([body], { type: 'text/plain;charset=UTF-8' }));
+    } else {
+      fetch(ENDPOINT, {
+        method: 'POST',
+        body: body,
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        keepalive: true
+      }).catch(function () {});
+    }
+  }
+
+  send('view');
+
+  // Delegated, so the click is recorded before the browser leaves the page.
+  document.addEventListener('click', function (e) {
+    var link = e.target && e.target.closest && e.target.closest('a[data-track]');
+    if (link) send(link.getAttribute('data-track'));
+  });
+})();
+</script>
 </body>
 </html>

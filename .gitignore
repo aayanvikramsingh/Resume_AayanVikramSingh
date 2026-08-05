@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.dev.vars
+
+# Working copies of the resume. The served PDF is Aayan_Vikram_Singh_Resume.pdf;
+# the .docx is the editable source and is deliberately not published.
+Resume_3August.docx
+Resume_3August.pdf

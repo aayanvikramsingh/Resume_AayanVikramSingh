@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Resume — traffic</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink:    #0F1D2A;
+    --paper:  #EDF1F5;
+    --rule:   #C6D2DE;
+    --accent: #1F4FD8;
+    --muted:  #5B6B7C;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+    color: var(--ink);
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    line-height: 1.55;
+  }
+
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  h1 {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0 0 0.5rem;
+  }
+
+  .sub { color: var(--muted); font-size: 0.8125rem; margin: 0 0 2.5rem; }
+
+  h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin: 2.75rem 0 1rem;
+  }
+
+  input, button {
+    font: inherit;
+    font-size: 0.875rem;
+    padding: 0.8rem 1.1rem;
+    border: 1.5px solid var(--ink);
+    background: #fff;
+    color: var(--ink);
+  }
+
+  button { background: var(--ink); color: var(--paper); cursor: pointer; }
+  button:hover { box-shadow: 3px 3px 0 var(--accent); }
+  input:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  .gate { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--accent);
+    padding: 1.25rem;
+  }
+
+  .card .n {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    display: block;
+  }
+
+  .card .k {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+  .panel { background: #fff; border: 1.5px solid var(--ink); padding: 1.25rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+  th, td { text-align: left; padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 500; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: 0; }
+
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+
+  /* Timeline: one column per day, height proportional to that day's views. */
+  .chart { display: flex; align-items: flex-end; gap: 3px; height: 9rem; }
+  .chart div { flex: 1; background: var(--accent); min-height: 2px; }
+  .chart div:hover { background: var(--ink); }
+
+  .axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.6875rem; margin-top: 0.5rem; }
+
+  .msg { color: var(--muted); font-size: 0.8125rem; }
+  .err { color: #B3261E; }
+  .hide { display: none; }
+
+  a.back { color: var(--ink); font-size: 0.8125rem; border-bottom: 1.5px solid var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Traffic</h1>
+  <p class="sub">Resume landing page · <a class="back" href="./">back to the page</a></p>
+
+  <form class="gate" id="gate">
+    <input id="pw" type="password" placeholder="stats password" autocomplete="current-password" required>
+    <button type="submit">Show</button>
+    <button type="button" id="forget" class="hide">Forget</button>
+  </form>
+
+  <p class="msg" id="msg"></p>
+
+  <section id="out" class="hide">
+    <div class="cards" id="cards"></div>
+
+    <h2>Views per day</h2>
+    <div class="panel">
+      <div class="chart" id="chart"></div>
+      <div class="axis"><span id="from"></span><span id="to"></span></div>
+    </div>
+
+    <h2>Where they came from</h2>
+    <div class="grid2">
+      <div class="panel"><table id="referrers"></table></div>
+      <div class="panel"><table id="sources"></table></div>
+    </div>
+
+    <h2>Who and what</h2>
+    <div class="grid2">
+      <div class="panel"><table id="countries"></table></div>
+      <div class="panel"><table id="cities"></table></div>
+      <div class="panel"><table id="devices"></table></div>
+      <div class="panel"><table id="events"></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ---------------------------------------------------------------------------
+// Replace with your deployed Worker URL (wrangler prints it after `deploy`).
+const ENDPOINT = 'https://resume-stats.aayanvikramsingh.workers.dev';
+// ---------------------------------------------------------------------------
+
+const $ = (id) => document.getElementById(id);
+const STORE = 'resume-stats-pw';
+
+const gate = $('gate');
+const msg = $('msg');
+const forget = $('forget');
+
+gate.addEventListener('submit', (e) => {
+  e.preventDefault();
+  load($('pw').value.trim(), true);
+});
+
+forget.addEventListener('click', () => {
+  localStorage.removeItem(STORE);
+  location.reload();
+});
+
+// A password kept from last time means the dashboard opens straight to the numbers.
+const saved = localStorage.getItem(STORE);
+if (saved) {
+  $('pw').value = saved;
+  load(saved, false);
+}
+
+async function load(password, remember) {
+  if (!password) return;
+  say('Loading…');
+
+  let res;
+  try {
+    res = await fetch(ENDPOINT + '/stats', {
+      headers: { Authorization: 'Bearer ' + password },
+    });
+  } catch {
+    return say('Could not reach the stats worker. Check that ENDPOINT is set correctly.', true);
+  }
+
+  if (res.status === 401) {
+    localStorage.removeItem(STORE);
+    return say('Wrong password.', true);
+  }
+  if (!res.ok) return say('Worker returned ' + res.status + '.', true);
+
+  if (remember) localStorage.setItem(STORE, password);
+  render(await res.json());
+}
+
+function say(text, isError) {
+  msg.textContent = text;
+  msg.classList.toggle('err', !!isError);
+}
+
+function render(data) {
+  say('Updated ' + new Date(data.generated).toLocaleString());
+  // Once we're in, the gate collapses to just the "Forget" escape hatch.
+  $('pw').classList.add('hide');
+  gate.querySelector('button[type=submit]').classList.add('hide');
+  forget.classList.remove('hide');
+  $('out').classList.remove('hide');
+
+  const t = data.totals;
+  $('cards').innerHTML = [
+    card(t.views, 'page views'),
+    card(t.visitors, 'visitors'),
+    card(t.resumeOpens, 'resume opens'),
+    card(t.clickThrough + '%', 'click-through'),
+  ].join('');
+
+  drawChart(data.timeline);
+
+  table('referrers', 'Referrer', data.referrers);
+  table('sources', 'Campaign tag', data.sources);
+  table('countries', 'Country', data.countries);
+  table('cities', 'City', data.cities);
+  table('devices', 'Device', data.devices);
+  table('events', 'Event', Object.entries(data.events).map(([label, count]) => ({ label, count })));
+}
+
+function card(value, label) {
+  return '<div class="card"><span class="n">' + esc(value) + '</span><span class="k">' + esc(label) + '</span></div>';
+}
+
+function drawChart(timeline) {
+  const chart = $('chart');
+  if (!timeline.length) {
+    chart.innerHTML = '';
+    $('from').textContent = $('to').textContent = '';
+    return;
+  }
+  const peak = Math.max(...timeline.map((d) => d.views));
+  chart.innerHTML = timeline
+    .map((d) => {
+      const pct = Math.round((d.views / peak) * 100);
+      const tip = d.day + ' · ' + d.views + ' views · ' + d.visitors + ' visitors';
+      return '<div style="height:' + pct + '%" title="' + esc(tip) + '"></div>';
+    })
+    .join('');
+  $('from').textContent = timeline[0].day;
+  $('to').textContent = timeline[timeline.length - 1].day;
+}
+
+function table(id, heading, rows) {
+  const body = rows.length
+    ? rows.map((r) => '<tr><td>' + esc(r.label) + '</td><td>' + r.count + '</td></tr>').join('')
+    : '<tr><td colspan="2" style="color:var(--muted)">nothing yet</td></tr>';
+  $(id).innerHTML = '<tr><th>' + esc(heading) + '</th><th>n</th></tr>' + body;
+}
+
+function esc(value) {
+  return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+name = "resume-stats"
+main = "src/index.js"
+compatibility_date = "2025-05-01"
+
+workers_dev = true
+# Preview URLs would expose the same endpoints on extra hostnames. Nothing here
+# needs them, so keep the surface to the one URL.
+preview_urls = false
+
+# Created by:  npx wrangler kv namespace create HITS
+# Paste the id it prints into the line below before deploying.
+[[kv_namespaces]]
+binding = "HITS"
+id = "6d6f009018b1432c84145b9ad4bedc51"
+
+# STATS_PASSWORD is deliberately not in this file — it is set as an encrypted
+# secret so it never lands in the repo:  npx wrangler secret put STATS_PASSWORD
